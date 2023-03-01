@@ -3,7 +3,7 @@ import pandas
 import json
 QUOTECHAR = '"'
 ENCODING = 'latin-1'
-DEBUG = False
+DEBUG = True
 
 # Resources:
 '''
@@ -55,7 +55,7 @@ def read_data(debug_mode = False):
     # Drill down into data directory
     if debug_mode:
         print("Changing into data subfolder...")
-    os.chdir('data')
+    os.chdir('.\\tableau\p1_youtube\data\\')
     if debug_mode:
         print('CWD: {0}'.format(os.getcwd()))
         print("Successful change into data subfolder.\n")
@@ -67,7 +67,7 @@ def read_data(debug_mode = False):
     for x in os.listdir():
         if x.endswith(".csv"):
         # Appends only csv file present in folder
-            csv_paths.append(cwd + '\data\\' + x)
+            csv_paths.append(cwd + '.\\tableau\p1_youtube\data\\' + x)
     if debug_mode:
         print('CSV Paths: {0}: '.format(csv_paths))
         print("CSV File Paths gathered.\n")
@@ -78,7 +78,7 @@ def read_data(debug_mode = False):
     for x in os.listdir():
         if x.endswith(".json"):
         # Appends only csv file present in folder
-            json_paths.append(cwd + '\data\\' + x)
+            json_paths.append(cwd + '.\\tableau\p1_youtube\data\\' + x)
     if debug_mode:
         print('JSON Paths: {0}: '.format(json_paths))
         print("JSON File Paths gathered.\n")
@@ -88,12 +88,13 @@ def read_data(debug_mode = False):
         print("Reading CSV files...")
     csv_df = pandas.DataFrame()
     for file_path in csv_paths:
+        the_file_name = file_path.split("data\\",1)[1]
         if csv_df.empty:
             csv_df = read_csv(file_path, quotechar=QUOTECHAR,encoding=ENCODING, debug_mode=DEBUG)
-            csv_df['file_name'] = pandas.Series([file_path[-12:] for x in range(len(csv_df.index))])
+            csv_df['file_name'] = pandas.Series([the_file_name for x in range(len(csv_df.index))])
         else:
             temp_df = read_csv(file_path, quotechar=QUOTECHAR,encoding=ENCODING, debug_mode=DEBUG)
-            temp_df['file_name'] = pandas.Series([file_path[-12:] for x in range(len(temp_df.index))])
+            temp_df['file_name'] = pandas.Series([the_file_name for x in range(len(temp_df.index))])
             csv_df = pandas.concat([csv_df, temp_df])
     if debug_mode:
         print(csv_df)
@@ -103,12 +104,13 @@ def read_data(debug_mode = False):
         print("Reading JSON files...")
     json_df = pandas.DataFrame()
     for file_path in json_paths:
+        the_file_name = file_path.split("data\\",1)[1]
         if json_df.empty:
             json_df = read_json(file_path, debug_mode=DEBUG)
-            json_df['file_name'] = pandas.Series([file_path[-19:] for x in range(len(json_df.index))])
+            json_df['file_name'] = pandas.Series([the_file_name for x in range(len(json_df.index))])
         else:
             temp_df = read_json(file_path, debug_mode=DEBUG)
-            temp_df['file_name'] = pandas.Series([file_path[-19:] for x in range(len(temp_df.index))])
+            temp_df['file_name'] = pandas.Series([the_file_name for x in range(len(temp_df.index))])
             json_df = pandas.concat([json_df, temp_df])
     if debug_mode:
         print(json_df)
