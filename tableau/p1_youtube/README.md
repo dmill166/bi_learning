@@ -1,0 +1,1 @@
+This dataset was obtained from [Kaggle](https://www.kaggle.com/datasets/datasnaek/youtube-new) as of 2023-02-26.
