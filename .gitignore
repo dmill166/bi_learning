@@ -140,3 +140,6 @@ dmypy.json
 .twb
 .twbr
 .hyper
+tableau/p1_youtube/p1_youtube.twb
+tableau/p1_youtube/~p1_youtube__14688.twbr
+tableau/p1_youtube/clean_data.tfl
