@@ -130,4 +130,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-tableau/p1_youtube/videos.hyper
+
+# Project-specific CSV and JSON files
+/tableau/p1_youtube/data/*.json
+/tableau/p1_youtube/data/*.csv
+
+# Tableau files
+.tfl
+.twb
+.twbr
+.hyper
