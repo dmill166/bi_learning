@@ -3,14 +3,16 @@ import pandas
 import json
 import pyodbc
 from sqlalchemy.engine import URL, create_engine
+from sqlalchemy.types import NVARCHAR
 QUOTECHAR = '"'
-ENCODING = 'latin-1'
+ENCODING = 'utf-8'
 DEBUG = True
 SERVER_STR = 'p1youtube_server'
 DATABASE_STR = 'p1youtube_database'
 USER_STR = 'p1youtube_user'
 PASS_STR = 'p1youtube_pass'
-BATCH_INSERT_SIZE = 5000
+BATCH_INSERT_SIZE = 50000
+DATA_SUBFOLDER = '.\\tableau\p1_youtube\data\\'
 
 # Resources:
 '''
@@ -25,6 +27,7 @@ R07. https://www.nylas.com/blog/making-use-of-environment-variables-in-python/ #
 R08. https://learn.microsoft.com/en-us/sql/machine-learning/data-exploration/python-dataframe-sql-server?view=sql-server-ver16 #insert data into mssql using pandas df
 R09. https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_sql.html # pandas to_Sql docs
 R10. https://docs.sqlalchemy.org/en/14/dialects/mssql.html#module-sqlalchemy.dialects.mssql.pyodbc # sqlalchemy mssql docs
+R11. https://stackoverflow.com/questions/55801668/the-type-of-field-is-not-a-sqlalchemy-type-with-pandas-to-sql-to-an-oracle-dat #df datatypes for sql insert
 '''
 
 def read_csv(file_path, quotechar, encoding, debug_mode = False):
@@ -79,7 +82,7 @@ def read_data(debug_mode = False):
     for x in os.listdir():
         if x.endswith(".csv"):
         # Appends only csv file present in folder
-            csv_paths.append(cwd + '.\\tableau\p1_youtube\data\\' + x)
+            csv_paths.append(cwd + DATA_SUBFOLDER + x)
     if debug_mode:
         print('CSV Paths: {0}: '.format(csv_paths))
         print("CSV File Paths gathered.\n")
@@ -90,7 +93,7 @@ def read_data(debug_mode = False):
     for x in os.listdir():
         if x.endswith(".json"):
         # Appends only csv file present in folder
-            json_paths.append(cwd + '.\\tableau\p1_youtube\data\\' + x)
+            json_paths.append(cwd + DATA_SUBFOLDER + x)
     if debug_mode:
         print('JSON Paths: {0}: '.format(json_paths))
         print("JSON File Paths gathered.\n")
@@ -148,59 +151,21 @@ def sql_driver(list_of_df, debug_mode=DEBUG):
     # connect to database
     if debug_mode:
         print("Attempting connection...")
+    connection_url = f"mssql+pyodbc://{prj_user}:{prj_pass}@{prj_server}/{prj_db}?driver=ODBC+Driver+17+for+SQL+Server"
+    engine = create_engine(connection_url, fast_executemany=True)
 
-    
-    connection_string = ('DRIVER={SQL Server};SERVER='+prj_server+';DATABASE='+prj_db+';UID='+prj_user+';PWD='+prj_pass)
-    connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": connection_string})
-
-    engine = create_engine(connection_url)
-    cnxn = pyodbc.connect(connection_string)
-    cursor = cnxn.cursor()
     if debug_mode:
         print("Connection successful!")
 
     # insert dataframes
+    list_of_df.pop(1)
     for df in list_of_df:
-    # generate SQL unique to columns avail in dataframe
-        df.to_sql(prj_db + '.dbo.' + df.name, engine, 'dbo', if_exists="append", chunksize=BATCH_INSERT_SIZE)
 
-        cursor.close()
-"""         
-        die_sql = 'DROP TABLE IF EXISTS ' + prj_db + '.dbo.' + df.name + ';'
-        if debug_mode:
-            print("DIE_SQL: {0}".format(die_sql))
-"""
+        df.to_sql(df.name, engine, schema='dbo', if_exists='append',
+         chunksize=BATCH_INSERT_SIZE,index=None)
 
-
-
-"""
-        create_sql = 'CREATE TABLE ' + prj_db + '.dbo.' + df.name + '( ' + df.columns[0] + ' NVARCHAR(2000) '
-        for column in df.columns[1:]:
-            create_sql += (', ' + column + ' NVARCHAR(2000)')
-        create_sql += ', load_datetime datetime(2) );'
-        if debug_mode:
-            print("CREATE SQL: {0}".format(create_sql))
-
-        if len(df.index) > 0:
-            inserts = []
-            insert_sql = 'INSERT INTO ' + prj_db + '.dbo.' + df.name + ' VALUES '
-            val_count = 0
-            for row in df.iterrows():
-                while val_count < BATCH_INSERT_SIZE:
-                    insert
-
-
-        if debug_mode:
-            print("INSERT SQL: {0}".format(insert_sql))
-"""
-
-    
-    # execute SQL
-    
-    #    for index, row in df.iterrows():
-    #        cursor.execute("INSERT INTO HumanResources.DepartmentTest (DepartmentID,Name,GroupName) values(?,?,?)", row.DepartmentID, row.Name, row.GroupName)
-    #    cnxn.commit()
-    #    cursor.close()
+    engine.dispose()
+             
 
 def main():
     list_of_df = read_data(debug_mode=DEBUG)
