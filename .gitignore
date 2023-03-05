@@ -131,10 +131,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Project-specific CSV and JSON files
-/tableau/p1_youtube/data/*.json
-/tableau/p1_youtube/data/*.csv
-
 # Tableau files
 .tfl
 .twb
@@ -143,3 +139,27 @@ dmypy.json
 tableau/p1_youtube/p1_youtube.twb
 tableau/p1_youtube/~p1_youtube__14688.twbr
 tableau/p1_youtube/clean_data.tfl
+
+# Project-specific CSV and JSON files
+/tableau/p1_youtube/data/*.json
+/tableau/p1_youtube/data/*.csv
+tableau\p1_youtube\data\CA_category_id.json
+tableau\p1_youtube\data\CAvideos.csv
+tableau\p1_youtube\data\DE_category_id.json
+tableau\p1_youtube\data\DEvideos.csv
+tableau\p1_youtube\data\FR_category_id.json
+tableau\p1_youtube\data\FRvideos.csv
+tableau\p1_youtube\data\GB_category_id.json
+tableau\p1_youtube\data\GBvideos.csv
+tableau\p1_youtube\data\IN_category_id.json
+tableau\p1_youtube\data\INvideos.csv
+tableau\p1_youtube\data\JP_category_id.json
+tableau\p1_youtube\data\JPvideos.csv
+tableau\p1_youtube\data\KR_category_id.json
+tableau\p1_youtube\data\KRvideos.csv
+tableau\p1_youtube\data\MX_category_id.json
+tableau\p1_youtube\data\MXvideos.csv
+tableau\p1_youtube\data\RU_category_id.json
+tableau\p1_youtube\data\RUvideos.csv
+tableau\p1_youtube\data\US_category_id.json
+tableau\p1_youtube\data\USvideos.csv
