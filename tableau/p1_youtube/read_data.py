@@ -3,9 +3,8 @@ import pandas
 import json
 import pyodbc
 from sqlalchemy.engine import URL, create_engine
-from sqlalchemy.types import NVARCHAR
 QUOTECHAR = '"'
-ENCODING = 'utf-8'
+ENCODING = 'latin-1'
 DEBUG = True
 SERVER_STR = 'p1youtube_server'
 DATABASE_STR = 'p1youtube_database'
@@ -36,7 +35,7 @@ def read_csv(file_path, quotechar, encoding, debug_mode = False):
 
     if debug_mode:
         print("File Path: {0}".format(file_path))
-    csv = pandas.read_csv(file_path,quotechar=quotechar,encoding=encoding)
+    csv = pandas.read_csv(file_path,quotechar=quotechar,encoding=encoding, on_bad_lines='skip')
     if debug_mode:
         print("File path {0} read successfully.".format(file_path))
     return csv
@@ -50,9 +49,11 @@ def read_json(file_path, debug_mode = False):
     json = pandas.read_json(file_path)
     d = [pandas.DataFrame(json[col].tolist()).add_prefix(col) for col in json.columns]
     json = pandas.concat(d, axis=1)
+    e = [pandas.DataFrame(json[col].tolist()).add_prefix(col) for col in json.columns]
+    json_df = pandas.concat(e, axis=1)
     if debug_mode:
         print("File path {0} read successfully.".format(file_path))
-    return json
+    return json_df
 
 
 def read_data(debug_mode = False):
@@ -70,7 +71,7 @@ def read_data(debug_mode = False):
     # Drill down into data directory
     if debug_mode:
         print("Changing into data subfolder...")
-    os.chdir('.\\tableau\p1_youtube\data\\')
+    os.chdir(DATA_SUBFOLDER)
     if debug_mode:
         print('CWD: {0}'.format(os.getcwd()))
         print("Successful change into data subfolder.\n")
@@ -158,12 +159,11 @@ def sql_driver(list_of_df, debug_mode=DEBUG):
         print("Connection successful!")
 
     # insert dataframes
-    list_of_df.pop(1)
     for df in list_of_df:
-
         df.to_sql(df.name, engine, schema='dbo', if_exists='append',
          chunksize=BATCH_INSERT_SIZE,index=None)
-
+        if debug_mode:
+            print(f'Writing {df.name} complete.')
     engine.dispose()
              
 
